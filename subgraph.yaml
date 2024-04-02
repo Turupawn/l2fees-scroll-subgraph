@@ -3,46 +3,48 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Contract
-    network: scroll-sepolia
+    name: UniV3Pool
+    network: scroll
     source:
-      address: "0x17AFD0263D6909Ba1F9a8EAC697f76532365Fb95"
-      abi: Contract
+      address: "0x813Df550a32d4A9d42010D057386429ad2328ED9"
+      abi: UniV3Pool
       startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Burn
-        - Collect
-        - CollectProtocol
-        - Flash
-        - IncreaseObservationCardinalityNext
-        - Initialize
-        - Mint
-        - SetFeeProtocol
         - Swap
       abis:
-        - name: Contract
-          file: ./abis/Contract.json
+        - name: UniV3Pool
+          file: ./abis/UniV3Pool.json
+        - name: ScrollGasPrecompile
+          file: ./abis/ScrollGasPrecompile.json
       eventHandlers:
-        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
-          handler: handleBurn
-        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
-          handler: handleCollect
-        - event: CollectProtocol(indexed address,indexed address,uint128,uint128)
-          handler: handleCollectProtocol
-        - event: Flash(indexed address,indexed address,uint256,uint256,uint256,uint256)
-          handler: handleFlash
-        - event: IncreaseObservationCardinalityNext(uint16,uint16)
-          handler: handleIncreaseObservationCardinalityNext
-        - event: Initialize(uint160,int24)
-          handler: handleInitialize
-        - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
-          handler: handleMint
-        - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
-          handler: handleSetFeeProtocol
         - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
           handler: handleSwap
-      file: ./src/contract.ts
+          receipt: true
+      file: ./src/uni-v3-pool.ts
+  - kind: ethereum
+    name: USDC
+    network: scroll
+    source:
+      address: "0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4"
+      abi: ERC20
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Swap
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ScrollGasPrecompile
+          file: ./abis/ScrollGasPrecompile.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+          receipt: true
+      file: ./src/erc20.ts
